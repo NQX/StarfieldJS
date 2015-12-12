@@ -1,0 +1,75 @@
+<Doctype <!DOCTYPE html>
+<html>
+<head>
+	<title>Starfield</title>
+	<script type="text/javascript">
+		MAX_DEPTH = 64;
+
+		var startzone = 100;
+
+		var canvas, ctx;
+		var stars = new Array(512);
+
+		window.onload = function(){
+			canvas = document.getElementById("myCanvas");
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+
+			if(canvas && canvas.getContext){
+				ctx = canvas.getContext("2d");
+				initStars();
+				setInterval(loop, 33);
+			}
+		}
+
+		function randomRange(minVal, maxVal){
+			return Math.floor(Math.random() * (maxVal - minVal - 1)) + minVal;
+		}
+
+		function initStars(){
+			for(var i = 0; i < stars.length; i++){
+				stars[i] = {
+					x : randomRange(-startzone, startzone),
+					y : randomRange(-startzone, startzone),
+					z : randomRange(1, MAX_DEPTH)
+				}
+			}
+		}
+
+		function loop(){
+			var halfWidth = canvas.width / 2;
+			var halfHeight = canvas.height / 2;
+
+			ctx.fillStyle = "rgb(0, 0, 0)";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			for(var i = 0; i < stars.length; i++){
+				stars[i].z -= 0.2;
+
+				if(stars[i].z <= 0){
+					stars[i].x = randomRange(-startzone, startzone);
+					stars[i].y = randomRange(-startzone, startzone);
+					stars[i].z = randomRange(1, MAX_DEPTH);
+				}
+
+				var k = 128.0 / stars[i].z;	
+				var px = stars[i].x * k + halfWidth;
+				var py = stars[i].y * k + halfHeight;
+
+				if(px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height){
+					var size = (1 -stars[i].z / MAX_DEPTH) * 3;
+					var shade = parseInt((1 - stars[i].z / MAX_DEPTH) * 255);
+					ctx.fillStyle = "rgb(" + shade + "," + shade + "," + shade + ")";
+					ctx.fillRect(px, py, size, size);
+				}
+			}
+		}
+	</script>
+</head>
+<body>
+	<canvas id='myCanvas'>
+		Your Browser does not support HTML5.
+	</canvas>
+
+</body>
+</html>
