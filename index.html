@@ -2,24 +2,38 @@
 <html>
 <head>
 	<title>Starfield</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<script type="text/javascript">
 		MAX_DEPTH = 64;
 
-		var startzone = 100;
+		var startzone = 150; //100
 
 		var canvas, ctx;
-		var stars = new Array(512);
+		var stars = new Array(2048);  //1024
+
+		var cursorX, cursorY;
+		var offsetX, offsetY;
+
+		var halfWidth, halfHeight;
 
 		window.onload = function(){
 			canvas = document.getElementById("myCanvas");
 			canvas.width = window.innerWidth;
 			canvas.height = window.innerHeight;
 
+			halfWidth = canvas.width / 2;
+			halfHeight = canvas.height / 2;
+
 			if(canvas && canvas.getContext){
 				ctx = canvas.getContext("2d");
 				initStars();
 				setInterval(loop, 33);
 			}
+		}
+
+		document.onmousemove = function(e){
+			cursorX = e.pageX;
+			cursorY = e.pageY;
 		}
 
 		function randomRange(minVal, maxVal){
@@ -37,8 +51,8 @@
 		}
 
 		function loop(){
-			var halfWidth = canvas.width / 2;
-			var halfHeight = canvas.height / 2;
+			setMousePos();
+			console.log(cursorX);
 
 			ctx.fillStyle = "rgb(0, 0, 0)";
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -53,8 +67,8 @@
 				}
 
 				var k = 128.0 / stars[i].z;	
-				var px = stars[i].x * k + halfWidth;
-				var py = stars[i].y * k + halfHeight;
+				var px = stars[i].x * k + halfWidth + offsetX;
+				var py = stars[i].y * k + halfHeight + offsetY;
 
 				if(px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height){
 					var size = (1 -stars[i].z / MAX_DEPTH) * 3;
@@ -64,10 +78,20 @@
 				}
 			}
 		}
+
+		function setMousePos(){
+			offsetX = (cursorX + halfWidth) * 0.2;
+			offsetY = (cursorY + halfHeight) * 0.2;
+
+			//startzone = cursorX * 0.1;
+			//cursorY * 0.1;
+
+
+		}
 	</script>
 </head>
 <body>
-	<canvas id='myCanvas'>
+	<canvas id='myCanvas' class="canvasClass">
 		Your Browser does not support HTML5.
 	</canvas>
 
