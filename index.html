@@ -14,6 +14,8 @@
 		var cursorX, cursorY;
 		var offsetX, offsetY;
 
+		var moveModifier = 0.2;
+
 		var halfWidth, halfHeight;
 
 		window.onload = function(){
@@ -32,8 +34,8 @@
 		}
 
 		document.onmousemove = function(e){
-			cursorX = e.pageX;
-			cursorY = e.pageY;
+			cursorX = -(e.pageX);
+			cursorY = -(e.pageY);
 		}
 
 		function randomRange(minVal, maxVal){
@@ -80,8 +82,8 @@
 		}
 
 		function setMousePos(){
-			offsetX = (cursorX + halfWidth) * 0.2;
-			offsetY = (cursorY + halfHeight) * 0.2;
+			offsetX = (cursorX + halfWidth) * moveModifier;
+			offsetY = (cursorY + halfHeight) * moveModifier;
 
 			//startzone = cursorX * 0.1;
 			//cursorY * 0.1;
