@@ -5,12 +5,15 @@
 		var canvas, ctx;
 		var stars = new Array(2048);  //1024 // 2048
 
-		var cursorX, cursorY;
-		var offsetX, offsetY;
+		var cursorX, cursorY = 100;
+		
 
 		var moveModifier = 0.2;
 
 		var halfWidth, halfHeight;
+		
+
+		var speed = 0.2;
 
 		var colors = [ '#FFAAAA',
 						'#AAFFAA',
@@ -20,7 +23,6 @@
 						'#FFFF00'
 					];
 
-	var colors2 = [ '#FF0000'];
 					
 
 	function vec2(x, y){
@@ -50,6 +52,7 @@
 				//setInterval(loop, 17);
 				requestAnimationFrame(loop);
 			}
+			
 		}
 
 		document.onmousemove = function(e){
@@ -63,24 +66,34 @@
 
 		function initStars(){
 			for(var i = 0; i < stars.length; i++){
-				stars[i] = {
-					x : randomRange(-startzone, startzone),
-					y : randomRange(-startzone, startzone),
-					z : randomRange(1, MAX_DEPTH),
-					color : colors[randomRange(0, colors.length)]
-				}
+				stars[i] = new Star();
 			}
 		}
 
-		function loop(){
-			setMousePos();
-			console.log(cursorX);
 
-			ctx.fillStyle = "rgb(0, 0, 0)";
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
+		function Star(){
+			this.x = randomRange(-startzone, startzone);
+			this.y = randomRange(-startzone, startzone);
+			this.z = randomRange(1, MAX_DEPTH);
+			
+			var color = hexToRGB(colors[randomRange(0, colors.length)]);
+
+			this.r = color.r;
+			this.g = color.g;
+			this.b = color.b;
+
+			this.size = randomRange(3, 6);
+		}
+
+
+		function loop(){
+			var mousePos = setMousePos();
+
+			//Clear Screen
+			clearScreen();
 
 			for(var i = 0; i < stars.length; i++){
-				stars[i].z -= 0.2;
+				stars[i].z -= speed;
 
 				if(stars[i].z <= 0){
 					stars[i].x = randomRange(-startzone, startzone);
@@ -89,14 +102,14 @@
 				}
 
 				var k = 128.0 / stars[i].z;	
-				var px = stars[i].x * k + halfWidth + offsetX;
-				var py = stars[i].y * k + halfHeight + offsetY;
+				var px = stars[i].x * k + halfWidth + mousePos.x;
+				var py = stars[i].y * k + halfHeight + mousePos.y;
 
 				if(px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height){
-					var size = (1 -stars[i].z / MAX_DEPTH) * 3; //
+					var size = (1 -stars[i].z / MAX_DEPTH) * stars[i].size; //3/
 					var shade = parseInt((1 - stars[i].z / MAX_DEPTH) * 255);
-					ctx.fillStyle = "rgb(" + shade + "," + shade + "," + shade + ")";
-					//ctx.fillStyle = 'rgba(' + stars[i].color + 1.0 + ')';
+					//ctx.fillStyle = "rgba(" + shade + "," + shade + "," + shade + "," + shade + ")";
+					ctx.fillStyle = "rgba(" + stars[i].r + "," + stars[i].g + "," + stars[i].b + "," + shade + ")";
 					ctx.fillRect(px, py, size, size);
 				}
 			}
@@ -104,12 +117,43 @@
 			requestAnimationFrame(loop);
 		}
 
+
+		function hexToRGB(hex){
+			var hex2 = hex.replace("#", "");
+			
+			var r = hex2.slice(0,2);
+			var g = hex2.slice(2,4);
+			var b = hex2.slice(4,6);
+
+			r = parseInt(r, 16);
+ 			g = parseInt(g, 16);
+ 			b = parseInt(b, 16);
+
+
+			return {'r' : r,
+					'g' : g,
+					'b' : b
+				};
+		}
+
+		function clearScreen(){
+			ctx.fillStyle = "rgb(0, 0, 0)";
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+		}
+
 		function setMousePos(){
-			offsetX = (cursorX + halfWidth) * moveModifier;
-			offsetY = (cursorY + halfHeight) * moveModifier;
+			var x = (cursorX + halfWidth) * moveModifier;
+			var y = (cursorY + halfHeight) * moveModifier;
 
-			//startzone = cursorX * 0.1;
-			//cursorY * 0.1;
+			if(isNaN(x)){
+				x = 0;	
+			}
 
+			if(isNaN(y)){
+				y = 0;
+			}
 
+			return {'x' : x,
+					'y' : y 
+				   };
 		}
