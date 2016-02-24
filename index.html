@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title>Starfield</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
 	<script type="text/javascript">
 		MAX_DEPTH = 64;
 
@@ -47,14 +47,17 @@
 				stars[i] = {
 					x : randomRange(-startzone, startzone),
 					y : randomRange(-startzone, startzone),
-					z : randomRange(1, MAX_DEPTH)
+					z : randomRange(1, MAX_DEPTH),
+					size : randomRange(0, 5),
+					r : randomRange(0, 255),
+					g : randomRange(0, 255),
+					b : randomRange(0, 255)
 				}
 			}
 		}
 
 		function loop(){
 			setMousePos();
-			console.log(cursorX);
 
 			ctx.fillStyle = "rgb(0, 0, 0)";
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -65,8 +68,24 @@
 				if(stars[i].z <= 0){
 					stars[i].x = randomRange(-startzone, startzone);
 					stars[i].y = randomRange(-startzone, startzone);
-					stars[i].z = randomRange(1, MAX_DEPTH);
+					stars[i].z = randomRange(50, MAX_DEPTH),
+					stars[i].r = randomRange(0, 255),
+					stars[i].g = randomRange(0, 255),
+					stars[i].b = randomRange(0, 255)
 				}
+
+				var brightModifier = 5;
+
+				/*
+				stars[i].r = stars[i].r  += brightModifier;
+				if(stars[i].r > 255) stars[i].r = 255;
+
+				stars[i].g = stars[i].g  += brightModifier;
+				if(stars[i].g > 255) stars[i].g = 255;
+
+				stars[i].b = stars[i].b  += brightModifier;
+				if(stars[i].b > 255) stars[i].b = 255;
+				*/
 
 				var k = 128.0 / stars[i].z;	
 				var px = stars[i].x * k + halfWidth + offsetX;
@@ -74,8 +93,13 @@
 
 				if(px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height){
 					var size = (1 -stars[i].z / MAX_DEPTH) * 3;
-					var shade = parseInt((1 - stars[i].z / MAX_DEPTH) * 255);
-					ctx.fillStyle = "rgb(" + shade + "," + shade + "," + shade + ")";
+					var shade = parseFloat((1 - stars[i].z / MAX_DEPTH));
+					//console.log(shade);
+
+
+					ctx.fillStyle = "rgba(" + (stars[i].r ) + "," + (stars[i].g ) + "," + (stars[i].b ) + ","  + shade + ")";
+					//console.log(stars[i].r);
+					//console.log("f");
 					ctx.fillRect(px, py, size, size);
 				}
 			}
