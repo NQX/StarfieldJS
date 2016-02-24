@@ -6,12 +6,12 @@
 		var stars = new Array(2048);  //1024 // 2048
 
 		var cursorX, cursorY = 100;
-		
+
 
 		var moveModifier = 0.2;
 
 		var halfWidth, halfHeight;
-		
+
 
 		var speed = 0.2;
 
@@ -23,7 +23,7 @@
 						'#FFFF00'
 					];
 
-					
+
 
 	function vec2(x, y){
 		this.x = x;
@@ -34,7 +34,7 @@
 		this.x = x;
 		this.y = y;
 		this.z = z;
-		this.w = w; 
+		this.w = w;
 	}
 
 
@@ -52,7 +52,7 @@
 				//setInterval(loop, 17);
 				requestAnimationFrame(loop);
 			}
-			
+
 		}
 
 		document.onmousemove = function(e){
@@ -75,7 +75,7 @@
 			this.x = randomRange(-startzone, startzone);
 			this.y = randomRange(-startzone, startzone);
 			this.z = randomRange(1, MAX_DEPTH);
-			
+
 			var color = hexToRGB(colors[randomRange(0, colors.length)]);
 
 			this.r = color.r;
@@ -98,16 +98,16 @@
 				if(stars[i].z <= 0){
 					stars[i].x = randomRange(-startzone, startzone);
 					stars[i].y = randomRange(-startzone, startzone);
-					stars[i].z = randomRange(1, MAX_DEPTH);
+					stars[i].z = randomRange(50, MAX_DEPTH);
 				}
 
-				var k = 128.0 / stars[i].z;	
+				var k = 128.0 / stars[i].z;
 				var px = stars[i].x * k + halfWidth + mousePos.x;
 				var py = stars[i].y * k + halfHeight + mousePos.y;
 
 				if(px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height){
 					var size = (1 -stars[i].z / MAX_DEPTH) * stars[i].size; //3/
-					var shade = parseInt((1 - stars[i].z / MAX_DEPTH) * 255);
+					var shade = parseFloat((1 - stars[i].z / MAX_DEPTH));
 					//ctx.fillStyle = "rgba(" + shade + "," + shade + "," + shade + "," + shade + ")";
 					ctx.fillStyle = "rgba(" + stars[i].r + "," + stars[i].g + "," + stars[i].b + "," + shade + ")";
 					ctx.fillRect(px, py, size, size);
@@ -120,7 +120,7 @@
 
 		function hexToRGB(hex){
 			var hex2 = hex.replace("#", "");
-			
+
 			var r = hex2.slice(0,2);
 			var g = hex2.slice(2,4);
 			var b = hex2.slice(4,6);
@@ -146,7 +146,7 @@
 			var y = (cursorY + halfHeight) * moveModifier;
 
 			if(isNaN(x)){
-				x = 0;	
+				x = 0;
 			}
 
 			if(isNaN(y)){
@@ -154,6 +154,6 @@
 			}
 
 			return {'x' : x,
-					'y' : y 
+					'y' : y
 				   };
 		}
