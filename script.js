@@ -6,9 +6,14 @@
 		var stars = new Array(2048);  //1024 // 2048
 
 		var cursorX, cursorY = 100;
+		var mouseX, mouseY = 0;
 
 
 		var moveModifier = 0.2;
+		var speedModifier = 20;
+
+		var targetPos = {x : 0,
+										 y : 0 };
 
 		var halfWidth, halfHeight;
 
@@ -22,6 +27,7 @@
 						'#FFFFFF',
 						'#FFFF00'
 					];
+
 
 
 
@@ -49,15 +55,17 @@
 			if(canvas && canvas.getContext){
 				ctx = canvas.getContext("2d");
 				initStars();
-				//setInterval(loop, 17);
-				requestAnimationFrame(loop);
+				setInterval(loop, 17);
+				//requestAnimationFrame(loop);
 			}
+
+
 
 		}
 
 		document.onmousemove = function(e){
-			cursorX = -(e.pageX);
-			cursorY = -(e.pageY);
+			mouseX = cursorX = (e.pageX);
+			mouseY = cursorY = (e.pageY);
 		}
 
 		function randomRange(minVal, maxVal){
@@ -76,7 +84,8 @@
 			this.y = randomRange(-startzone, startzone);
 			this.z = randomRange(1, MAX_DEPTH);
 
-			var color = hexToRGB(colors[randomRange(0, colors.length)]);
+		//	var color = hexToRGB(colors[randomRange(0, colors.length)]);
+			var color = hexToRGB('#FFFFFF');
 
 			this.r = color.r;
 			this.g = color.g;
@@ -87,10 +96,12 @@
 
 
 		function loop(){
-			var mousePos = setMousePos();
 
-			//Clear Screen
+			//var mousePos = setMousePos();
+
 			clearScreen();
+			moveWithDampening();
+
 
 			for(var i = 0; i < stars.length; i++){
 				stars[i].z -= speed;
@@ -102,19 +113,18 @@
 				}
 
 				var k = 128.0 / stars[i].z;
-				var px = stars[i].x * k + halfWidth + mousePos.x;
-				var py = stars[i].y * k + halfHeight + mousePos.y;
+				var px = stars[i].x * k + targetPos.x;
+				var py = stars[i].y * k + targetPos.y;
 
 				if(px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height){
 					var size = (1 -stars[i].z / MAX_DEPTH) * stars[i].size; //3/
 					var shade = parseFloat((1 - stars[i].z / MAX_DEPTH));
-					//ctx.fillStyle = "rgba(" + shade + "," + shade + "," + shade + "," + shade + ")";
 					ctx.fillStyle = "rgba(" + stars[i].r + "," + stars[i].g + "," + stars[i].b + "," + shade + ")";
 					ctx.fillRect(px, py, size, size);
 				}
 			}
 
-			requestAnimationFrame(loop);
+	//		requestAnimationFrame(loop);
 		}
 
 
@@ -142,8 +152,8 @@
 		}
 
 		function setMousePos(){
-			var x = (cursorX + halfWidth) * moveModifier;
-			var y = (cursorY + halfHeight) * moveModifier;
+			var x = (cursorX + halfWidth);// * moveModifier;
+			var y = (cursorY + halfHeight);// * moveModifier;
 
 			if(isNaN(x)){
 				x = 0;
@@ -156,4 +166,30 @@
 			return {'x' : x,
 					'y' : y
 				   };
+		}
+
+
+
+		function moveWithDampening(){
+			var x = mouseX - targetPos.x;
+			var y = mouseY - targetPos.y;
+
+
+
+			var mouseVec = {'x' : x,
+											'y' : y
+						   				};
+
+			var dx = mouseVec.x / speedModifier;
+			var dy = mouseVec.y / speedModifier;
+
+
+
+			if(isNaN(dx) || isNaN(dy)) return;
+
+			targetPos.x += dx;
+			targetPos.y += dy;
+
+
+			console.log(targetPos.x);
 		}
