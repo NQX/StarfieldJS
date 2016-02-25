@@ -188,10 +188,11 @@
 								   y:0};
 
 
-			speed.x = distance.x / speedModifier;
-			speed.y = distance.y / speedModifier;
+			speed.x = Math.floor(distance.x / speedModifier);
+			speed.y = Math.floor(distance.y / speedModifier);
 
 			starfieldPos.x += speed.x;
 			starfieldPos.y += speed.y;
-		
+
+
 		}
