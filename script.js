@@ -10,10 +10,10 @@
 
 
 		var moveModifier = 0.2;
-		var speedModifier = 20;
+		var speedModifier = 50;
 
-		var targetPos = {x : 0,
-										 y : 0 };
+		var starfieldPos = {x : 0,
+										    y : 0 };
 
 		var halfWidth, halfHeight;
 
@@ -49,8 +49,8 @@
 			canvas.width = window.innerWidth;
 			canvas.height = window.innerHeight;
 
-			halfWidth = canvas.width / 2;
-			halfHeight = canvas.height / 2;
+			starfieldPos.x = halfWidth = canvas.width / 2;
+			starfieldPos.y = halfHeight = canvas.height / 2;
 
 			if(canvas && canvas.getContext){
 				ctx = canvas.getContext("2d");
@@ -66,6 +66,9 @@
 		document.onmousemove = function(e){
 			mouseX = cursorX = (e.pageX);
 			mouseY = cursorY = (e.pageY);
+
+			if(isNaN(mouseX)) mouseX = 0;
+			if(isNaN(mouseY)) mouseY = 0;
 		}
 
 		function randomRange(minVal, maxVal){
@@ -100,7 +103,7 @@
 			//var mousePos = setMousePos();
 
 			clearScreen();
-			moveWithDampening();
+		  moveWithDampening();
 
 
 			for(var i = 0; i < stars.length; i++){
@@ -113,8 +116,8 @@
 				}
 
 				var k = 128.0 / stars[i].z;
-				var px = stars[i].x * k + targetPos.x;
-				var py = stars[i].y * k + targetPos.y;
+				var px = stars[i].x * k + starfieldPos.x;
+				var py = stars[i].y * k + starfieldPos.y;
 
 				if(px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height){
 					var size = (1 -stars[i].z / MAX_DEPTH) * stars[i].size; //3/
@@ -171,25 +174,24 @@
 
 
 		function moveWithDampening(){
-			var x = mouseX - targetPos.x;
-			var y = mouseY - targetPos.y;
+			if(isNaN(starfieldPos.x)) starfieldPos.x = 0;
+			if(isNaN(starfieldPos.y)) starfieldPos.y = 0;
+
+			var distance = {x:0,
+											y:0};
 
 
+			distance.x = mouseX - starfieldPos.x;;
+			distance.y = mouseY - starfieldPos.y;
 
-			var mouseVec = {'x' : x,
-											'y' : y
-						   				};
-
-			var dx = mouseVec.x / speedModifier;
-			var dy = mouseVec.y / speedModifier;
+			var speed = {x:0,
+								   y:0};
 
 
+			speed.x = distance.x / speedModifier;
+			speed.y = distance.y / speedModifier;
 
-			if(isNaN(dx) || isNaN(dy)) return;
-
-			targetPos.x += dx;
-			targetPos.y += dy;
-
-
-			console.log(targetPos.x);
+			starfieldPos.x += speed.x;
+			starfieldPos.y += speed.y;
+		
 		}
