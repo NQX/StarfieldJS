@@ -9,11 +9,15 @@
 		var mouseX, mouseY = 0;
 
 
-		var moveModifier = 0.2;
+		var moveModifier = 0.5;
 		var speedModifier = 50;
 
+
+		var modifiedWidth = 0;
+		var modifiedHeight = 0;
+
 		var starfieldPos = {x : 0,
-										    y : 0 };
+							y : 0 };
 
 		var halfWidth, halfHeight;
 
@@ -28,6 +32,12 @@
 						'#FFFF00'
 					];
 
+		var mapped = {x:0,
+					  y:0
+					 };
+
+		var screenWidth = 0;
+		var screenHeight = 0;
 
 
 
@@ -44,10 +54,16 @@
 	}
 
 
+	var stats = null;
+
+
 		function init(){
 			canvas = document.getElementById("myCanvas");
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
+			screenWidth = canvas.width = window.innerWidth;
+			screenHeight = canvas.height = window.innerHeight;
+
+			modifiedWidth = screenWidth * moveModifier;
+			modifiedHeight = screenHeight * moveModifier;
 
 			starfieldPos.x = halfWidth = canvas.width / 2;
 			starfieldPos.y = halfHeight = canvas.height / 2;
@@ -59,13 +75,20 @@
 				//requestAnimationFrame(loop);
 			}
 
-
+			//debug stuff
+			stats = new Stats();
+			stats.setMode(0);
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.left = '0px';
+			stats.domElement.style.top = '0px';
+			document.body.appendChild( stats.domElement );
 
 		}
 
 		document.onmousemove = function(e){
 			mouseX = cursorX = (e.pageX);
 			mouseY = cursorY = (e.pageY);
+
 
 			if(isNaN(mouseX)) mouseX = 0;
 			if(isNaN(mouseY)) mouseY = 0;
@@ -83,6 +106,7 @@
 
 
 		function Star(){
+			//create initial Position in 3D space
 			this.x = randomRange(-startzone, startzone);
 			this.y = randomRange(-startzone, startzone);
 			this.z = randomRange(1, MAX_DEPTH);
@@ -95,15 +119,17 @@
 			this.b = color.b;
 
 			this.size = randomRange(3, 6);
+
 		}
 
 
 		function loop(){
+			stats.begin();
 
-			//var mousePos = setMousePos();
 
 			clearScreen();
-		  moveWithDampening();
+		 	dampMouseInput();
+		  	moveStarfieldMapped();
 
 
 			for(var i = 0; i < stars.length; i++){
@@ -116,8 +142,10 @@
 				}
 
 				var k = 128.0 / stars[i].z;
-				var px = stars[i].x * k + starfieldPos.x;
-				var py = stars[i].y * k + starfieldPos.y;
+				var px = stars[i].x * k + mapped.x;
+				var py = stars[i].y * k + mapped.y;
+				//var px = stars[i].x * k + halfWidth;
+				//var py = stars[i].y * k + halfHeight;
 
 				if(px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height){
 					var size = (1 -stars[i].z / MAX_DEPTH) * stars[i].size; //3/
@@ -128,6 +156,17 @@
 			}
 
 	//		requestAnimationFrame(loop);
+
+			//drawRedDot();
+			stats.end();
+		}
+
+
+		function drawRedDot(){
+			//draws red dot in center
+			//for debug only
+			ctx.fillStyle = "#F00";
+			ctx.fillRect(mapped.x, mapped.y, 5, 5);
 		}
 
 
@@ -155,8 +194,8 @@
 		}
 
 		function setMousePos(){
-			var x = (cursorX + halfWidth);// * moveModifier;
-			var y = (cursorY + halfHeight);// * moveModifier;
+			var x = (cursorX + halfWidth);
+			var y = (cursorY + halfHeight);
 
 			if(isNaN(x)){
 				x = 0;
@@ -171,21 +210,46 @@
 				   };
 		}
 
+		function moveStarfieldMapped(){
+			//move Starfield with a reduced movement
+			mapped.x = map(starfieldPos.x, screenWidth, modifiedWidth);// + halfWidth;
+			mapped.y = map(starfieldPos.y, screenHeight, modifiedHeight);// + halfHeight;
+
+		}
+
+		function map(a, b, size){
+			//mapping a values into another scale
+			var orgPart = b / 100;
+			var mapPart = size / 100.0;
+			var countOrg = a / orgPart; 
+			var mapCount =  countOrg * mapPart;
+
+			return mapCount;
+		}
+
+	
 
 
-		function moveWithDampening(){
+		function dampMouseInput(){
+			//damp the movement of the mouse, based on old Position (starfieldPos)
 			if(isNaN(starfieldPos.x)) starfieldPos.x = 0;
 			if(isNaN(starfieldPos.y)) starfieldPos.y = 0;
 
 			var distance = {x:0,
-											y:0};
+							y:0};
 
+			if(mouseX == undefined) mouseX = halfWidth;
+			if(mouseY == undefined) mouseY = halfHeight;
 
-			distance.x = mouseX - starfieldPos.x;;
+			distance.x = mouseX - starfieldPos.x;
 			distance.y = mouseY - starfieldPos.y;
 
+			//center starfield
+			distance.x += halfWidth;
+			distance.y += halfHeight;
+
 			var speed = {x:0,
-								   y:0};
+						 y:0};
 
 
 			speed.x = Math.floor(distance.x / speedModifier);
@@ -194,5 +258,5 @@
 			starfieldPos.x += speed.x;
 			starfieldPos.y += speed.y;
 
-
 		}
+
