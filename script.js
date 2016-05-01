@@ -22,7 +22,7 @@
 		var halfWidth, halfHeight;
 
 
-		var speed = 0.2;
+		var speed = 0.2; //0.2
 
 		var colors = [ '#FFAAAA',
 						'#AAFFAA',
@@ -111,8 +111,8 @@
 			this.y = randomRange(-startzone, startzone);
 			this.z = randomRange(1, MAX_DEPTH);
 
-		//	var color = hexToRGB(colors[randomRange(0, colors.length)]);
-			var color = hexToRGB('#FFFFFF');
+			var color = hexToRGB(colors[randomRange(0, colors.length)]);
+			//var color = hexToRGB('#FFFFFF');
 
 			this.r = color.r;
 			this.g = color.g;
